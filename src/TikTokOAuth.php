@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\TikTok;
+namespace src;
 
-use App\TikTok\Config;
-use App\TikTok\Response;
-use App\TikTok\Util;
-use App\TikTok\TikTokOAuthException;
+use src\Config;
+use src\Response;
+use src\Util;
+use src\TikTokOAuthException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
