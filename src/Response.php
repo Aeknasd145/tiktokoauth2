@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace src;
+namespace App\TikTok;
+
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Handle response for TikTokOAuth.
@@ -29,6 +31,14 @@ class Response
 
 	public function setBody(array|object $body): void
 	{
+		if ($body instanceof StreamInterface) {
+			$body = (string) $body; // Convert StreamInterface to string
+		}
+
+		if (is_string($body)) {
+			$body = json_decode($body, true); // Decode JSON string to array/object
+		}
+
 		$this->body = $body;
 	}
 
