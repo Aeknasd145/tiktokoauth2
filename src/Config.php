@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace src\TikTok;
+namespace src;
 
 /**
  * Handle setting and storing config for TikTokOAuth.
