@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\TikTok;
+namespace src\TikTok;
 
 /**
  * Handle response for TikTokOAuth.
