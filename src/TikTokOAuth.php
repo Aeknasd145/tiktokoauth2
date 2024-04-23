@@ -115,7 +115,7 @@ class TikTokOAuth extends Config
 				]);
 
 				$this->response->setApiPath($endpoint);
-				$this->response->setBody(json_decode($response->getBody(), true));
+				$this->response->setBody(json_decode((string) $response->getBody(), true));
 				$this->response->setHttpCode($response->getStatusCode());
 				$this->response->setHeaders($response->getHeaders());
 
