@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace src;
+namespace App\TikTok;
 
-use src\Config;
-use src\Response;
-use src\Util;
-use src\TikTokOAuthException;
+use App\TikTok\Config;
+use App\TikTok\Response;
+use App\TikTok\Util;
+use App\TikTok\TikTokOAuthException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -37,14 +37,6 @@ class TikTokOAuth extends Config
 		$this->httpClient = new Client([
 			'base_uri' => $baseUrl,
 			'timeout' => $this->timeout,
-			'connect_timeout' => $this->connectionTimeout,
-			'verify' => $verify,
-			'http_errors' => $errors,
-			'curl' => [
-				CURLOPT_SSL_VERIFYHOST => 2,
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HEADER => true,
-			]
 		]);
 	}
 
@@ -85,50 +77,6 @@ class TikTokOAuth extends Config
 		}
 	}
 
-	public function get($endpoint, $params = []): ?Response
-	{
-		return $this->makeRequest('GET', $endpoint, $params);
-	}
-
-	public function post(string $endpoint, array $params = []): ?Response
-	{
-		return $this->makeRequest(self::API_HOST, 'POST', $endpoint, $params);
-	}
-
-	private function makeRequest(string $url, string $method, string $endpoint, array $params = []): ?Response
-	{
-		$this->initializeHttpClient($url);
-		$this->resetLastResponse();
-		$this->resetAttemptsNumber();
-		$params = $this->cleanUpParameters($params);
-
-		$headers = [
-			'Authorization' => 'Bearer ' . $this->accessToken,
-			'Content-Type' => 'application/json',
-		];
-
-		while ($this->requestsAvailable()) {
-			try {
-				$response = $this->httpClient->request($method, $endpoint, [
-					'headers' => $headers,
-					'body' => json_encode($params)
-				]);
-
-				$this->response->setApiPath($endpoint);
-				$this->response->setBody(json_decode((string) $response->getBody(), true));
-				$this->response->setHttpCode($response->getStatusCode());
-				$this->response->setHeaders($response->getHeaders());
-
-				return $this->response;
-			} catch (GuzzleException $e) {
-				$this->attempts++;
-				$this->sleepIfNeeded();
-				throw new TikTokOAuthException($e->getMessage(), $e->getCode());
-			}
-		}
-		throw new TikTokOAuthException("Failed to post after multiple attempts.");
-	}
-
 	private function cleanUpParameters($params)
 	{
 		return Util::sanitizeParameters($params);
@@ -151,14 +99,95 @@ class TikTokOAuth extends Config
 			$this->getLastHttpCode() >= 500;
 	}
 
+	public function get(string $endpoint, array $params = [], string $url = self::API_HOST): ?Response
+	{
+		return $this->makeRequest($url, 'GET', $endpoint, $params);
+	}
+
+	public function post(string $endpoint, array $params = [], string $baseUrl = self::API_HOST): ?Response
+	{
+		return $this->makeRequest($baseUrl, 'POST', $endpoint, $params);
+	}
+
+	private function makeRequest(string $baseUrl, string $method, string $endpoint, array $params = []): ?Response
+	{
+		$this->initializeHttpClient($baseUrl);
+		$this->resetLastResponse();
+		$this->resetAttemptsNumber();
+
+		$headers = [
+			'Content-Type' => 'application/x-www-form-urlencoded',
+		];
+
+		do {
+			try {
+				$response = $this->httpClient->request($method, $endpoint, [
+					'form_params' => $params,
+					'headers' => $headers
+				]);
+
+				$body = (string)$response->getBody();
+				$parsedBody = json_decode($body, true);
+
+				$this->response->setApiPath($endpoint);
+				$this->response->setBody($parsedBody);
+				$this->response->setHttpCode($response->getStatusCode());
+				$this->response->setHeaders($response->getHeaders());
+
+				return $this->response;
+			} catch (GuzzleException $e) {
+				$this->attempts++;
+				$this->sleepIfNeeded();
+				if (!$this->requestsAvailable()) {
+					throw new TikTokOAuthException("Maximum retry limit reached with no successful response.", $e->getCode());
+				}
+			}
+		} while ($this->requestsAvailable());
+
+		return $this->response;
+	}
+
 	public function getAuthUrl(array $scopes = ['user.info.basic'], string $responseCode = 'code'): string
 	{
 		$csrfState = bin2hex(random_bytes(16)); // More secure CSRF token generation
-		// TODO: CSRF için kullan
+		// TODO: Use CSRF for security reasons
 		/*setcookie('csrfState', $csrfState, time() + 600);*/
 
 		$scopes = implode(',', $scopes);
 
 		return self::API_HOST . "v{$this->apiVersion}/auth/authorize/?client_key={$this->getClientKey()}&scope={$scopes}&response_type={$responseCode}&redirect_uri={$this->getRedirectUri()}&state={$csrfState}";
+	}
+
+	/**
+	 *	Create first access token after login callback
+	 */
+	public function fetchAccessToken(string $code): object|array|string
+	{
+		$endpoint = 'oauth/token/';
+		$params = [
+			'client_key' => $this->getClientKey(),
+			'client_secret' => $this->getClientSecret(),
+			'code' => urldecode($code),
+			'grant_type' => 'authorization_code',
+			'redirect_uri' => $this->getRedirectUri()
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST)->getBody();
+	}
+
+	/**
+	 *	Refresh access token when needed
+	 */
+	public function refreshAccessToken(string $refreshToken): object|array|string
+	{
+		$endpoint = 'oauth/token/';
+		$params = [
+			'client_key' => $this->getClientKey(),
+			'client_secret' => $this->getClientSecret(),
+			'grant_type' => 'refresh_token',
+			'refresh_token' => $refreshToken
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST)->getBody();
 	}
 }
