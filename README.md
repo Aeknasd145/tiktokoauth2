@@ -10,7 +10,7 @@ $tikTokAuthUrl = $tikTok->getAuthUrl();
 
 ## When the callback returns, the following steps should be taken:
 ```php
-$accessTokenData = $tiktok->fetchAccessToken($code);
+$accessTokenData = $tikTok->fetchAccessToken($code);
 $accessToken = $accessTokenData['access_token'];
 $expiresIn = $accessTokenData['expires_in'];
 $openId = $accessTokenData['open_id'];
@@ -20,9 +20,9 @@ $scope = $accessTokenData['scope'];
 $tokenType = $accessTokenData['token_type'];
 ```
 
-## How to refresh access token when needed
+## How to refresh access token when needed?
 ```php
-$refreshTokenData = $tiktok->refreshAccessToken($refreshToken);
+$refreshTokenData = $tikTok->refreshAccessToken($refreshToken);
 $accessToken = $refreshTokenData['access_token'];
 $expiresIn = $refreshTokenData['expires_in'];
 $openId = $refreshTokenData['open_id'];
