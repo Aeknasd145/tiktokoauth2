@@ -128,7 +128,11 @@ class TikTokOAuth extends Config
 		];
 
 		if (!empty($params)) {
-			$options['form_params'] = $params;
+			if (isset($headers['Content-Type']) && $headers['Content-Type'] === 'application/json') {
+				$options['body'] = json_encode($params);
+			} else {
+				$options['form_params'] = $params;
+			}
 		}
 
 		do {
@@ -213,5 +217,49 @@ class TikTokOAuth extends Config
 			'Authorization' => "Bearer {$accessToken}"
 		];
 		return $this->get("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
+	}
+
+	// TODO: not tested yet (i am waiting for tiktok verification)
+	public function getQueryCreatorInfo(string $accessToken): object|array|string
+	{
+		$endpoint = 'post/publish/creator_info/query/';
+
+		$headers = [
+			'Authorization' => "Bearer {$accessToken}",
+			'Content-Type' => 'application/json; charset=UTF-8',
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
+	}
+
+	// TODO: not tested yet (i am waiting for tiktok verification)
+	// TODO: only works with url sources
+	public function publishTikTokPhoto(string $accessToken, string $title, string $description, array $photoImages, bool $disableComment = true, string $privacy_level = 'PUBLIC_TO_EVERYONE', bool $autoAddMusic = true): object|array|string
+	{
+		$endpoint = 'post/publish/content/init/';
+
+		$headers = [
+			'Authorization' => "Bearer {$accessToken}",
+			'Content-Type' => 'application/json'
+		];
+
+		$params = [
+			'post_info' => [
+				"title" => $title,
+				"description" => $description,
+				"disable_comment" => $disableComment,
+				"privacy_level" => $privacy_level,
+				"auto_add_music" => $autoAddMusic
+			],
+			'source_info' => [
+				"source" => "PULL_FROM_URL",
+				"photo_cover_index" => 1,
+				"photo_images" => $photoImages
+			],
+			'post_mode' => 'DIRECT_POST',
+			'media_type' => 'PHOTO'
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST, $headers)->getBody();
 	}
 }
