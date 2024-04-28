@@ -31,3 +31,14 @@ $refreshToken = $refreshTokenData['refresh_token'];
 $scope = $refreshTokenData['scope'];
 $tokenType = $refreshTokenData['token_type'];
 ```
+
+## Get user basic info (open_id, union_id, avatar_url, avatar_url_100, avatar_large_url, display_name)
+```php
+$userInfoBasicData = $tiktok->getUserInfoBasic($accessToken)['data']['user'];
+$openId = $userInfoBasicData['open_id'];
+$unionId = $userInfoBasicData['union_id'];
+$avatarUrl = $userInfoBasicData['avatar_url'];
+$avatarUrl100 = $userInfoBasicData['avatar_url_100'];
+$avatarLargeUrl = $userInfoBasicData['avatar_large_url'];
+$displayName = $userInfoBasicData['display_name'];
+```
