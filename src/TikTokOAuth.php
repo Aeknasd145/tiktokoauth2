@@ -99,32 +99,41 @@ class TikTokOAuth extends Config
 			$this->getLastHttpCode() >= 500;
 	}
 
-	public function get(string $endpoint, array $params = [], string $url = self::API_HOST): ?Response
+	public function get(string $endpoint, array $params = [], string $baseUrl = self::API_HOST, ?array $headers = NULL): ?Response
 	{
-		return $this->makeRequest($url, 'GET', $endpoint, $params);
+		if($headers) {
+			return $this->makeRequest($baseUrl, 'GET', $endpoint, $params, $headers);
+		} else {
+			return $this->makeRequest($baseUrl, 'GET', $endpoint, $params);
+		}
 	}
 
-	public function post(string $endpoint, array $params = [], string $baseUrl = self::API_HOST): ?Response
+	public function post(string $endpoint, array $params = [], string $baseUrl = self::API_HOST, ?array $headers = null): ?Response
 	{
-		return $this->makeRequest($baseUrl, 'POST', $endpoint, $params);
+		if ($headers) {
+			return $this->makeRequest($baseUrl, 'POST', $endpoint, $params, $headers);
+		} else {
+			return $this->makeRequest($baseUrl, 'POST', $endpoint, $params);
+		}
 	}
 
-	private function makeRequest(string $baseUrl, string $method, string $endpoint, array $params = []): ?Response
+	private function makeRequest(string $baseUrl, string $method, string $endpoint, array $params = [], array $headers = ['Content-Type' => 'application/x-www-form-urlencoded']): ?Response
 	{
 		$this->initializeHttpClient($baseUrl);
 		$this->resetLastResponse();
 		$this->resetAttemptsNumber();
 
-		$headers = [
-			'Content-Type' => 'application/x-www-form-urlencoded',
+		$options = [
+			'headers' => $headers
 		];
+
+		if (!empty($params)) {
+			$options['form_params'] = $params;
+		}
 
 		do {
 			try {
-				$response = $this->httpClient->request($method, $endpoint, [
-					'form_params' => $params,
-					'headers' => $headers
-				]);
+				$response = $this->httpClient->request($method, $endpoint, $options);
 
 				$body = (string)$response->getBody();
 				$parsedBody = json_decode($body, true);
@@ -189,5 +198,20 @@ class TikTokOAuth extends Config
 		];
 
 		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST)->getBody();
+	}
+
+	/**
+	 *	Get user basic information with access token
+  	 *	Available fields: open_id, union_id, avatar_url, avatar_url_100, avatar_large_url, display_name
+	 */
+	public function getUserInfoBasic(string $accessToken, array $fields = ['display_name', 'avatar_url']): object|array|string
+	{
+		$endpoint = 'user/info/';
+		$fields = implode(',', $fields);
+		$endpoint .= '?fields='.$fields;
+		$headers = [
+			'Authorization' => "Bearer {$accessToken}"
+		];
+		return $this->get("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
 	}
 }
