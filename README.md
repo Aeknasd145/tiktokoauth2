@@ -42,3 +42,16 @@ $avatarUrl100 = $userInfoBasicData['avatar_url_100'];
 $avatarLargeUrl = $userInfoBasicData['avatar_large_url'];
 $displayName = $userInfoBasicData['display_name'];
 ```
+
+## How to Get Query Creator Info?
+```php
+$queryCreatorInfo = $tiktok->getQueryCreatorInfo($accessToken)['data'];
+$stitchDisabled = $queryCreatorInfo['stitch_disabled'];
+$commentDisabled = $queryCreatorInfo['comment_disabled'];
+$creatorAvatarUrl = $queryCreatorInfo['creator_avatar_url'];
+$creatorNickname = $queryCreatorInfo['creator_nickname'];
+$creatorUsername = $queryCreatorInfo['creator_username'];
+$duetDisabled = $queryCreatorInfo['duet_disabled'];
+$maxVideoPostDurationSec = $queryCreatorInfo['max_video_post_duration_sec'];
+$privacyLevelOptions = $queryCreatorInfo['privacy_level_options']; // array, [0]=> string(18) "PUBLIC_TO_EVERYONE" [1]=> string(21) "MUTUAL_FOLLOW_FRIENDS" [2]=> string(9) "SELF_ONLY" 
+```
