@@ -219,7 +219,6 @@ class TikTokOAuth extends Config
 		return $this->get("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
 	}
 
-	// TODO: not tested yet (i am waiting for tiktok verification)
 	public function getQueryCreatorInfo(string $accessToken): object|array|string
 	{
 		$endpoint = 'post/publish/creator_info/query/';
@@ -232,8 +231,10 @@ class TikTokOAuth extends Config
 		return $this->post("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
 	}
 
-	// TODO: not tested yet (i am waiting for tiktok verification)
-	// TODO: only works with url sources
+	// TODO: not tested yet
+	/*
+	* only works with url sources
+	*/
 	public function publishTikTokPhoto(string $accessToken, string $title, string $description, array $photoImages, bool $disableComment = true, string $privacy_level = 'PUBLIC_TO_EVERYONE', bool $autoAddMusic = true): object|array|string
 	{
 		$endpoint = 'post/publish/content/init/';
