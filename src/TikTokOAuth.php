@@ -241,7 +241,7 @@ class TikTokOAuth extends Config
 	/*
 	 * Only works with url sources
 	*/
-	public function publishTikTokPhoto(string $accessToken, string $title, string $description, array $photoImages, bool $disableComment = true, string $privacy_level = 'PUBLIC_TO_EVERYONE', bool $autoAddMusic = true): object|array|string
+	public function publishTikTokPhoto(string $accessToken, string $title, string $description, array $photoImages, bool $disableComment = true, string $privacyLevel = 'SELF_ONLY', bool $autoAddMusic = true): object|array|string
 	{
 		$endpoint = 'post/publish/content/init/';
 
@@ -255,7 +255,7 @@ class TikTokOAuth extends Config
 				"title" => $title,
 				"description" => $description,
 				"disable_comment" => $disableComment,
-				"privacy_level" => 'SELF_ONLY',
+				"privacy_level" => $privacyLevel,
 				"auto_add_music" => $autoAddMusic
 			],
 			'source_info' => [
@@ -274,7 +274,7 @@ class TikTokOAuth extends Config
 	 * Only works with url sources
   	 * You will see '--header 'Content-Type: application/json; charset=UTF-8' \' in the official documentation but nevermind I got error when i use it, and it worked when I use 'Content-Type: application/json'
 	*/
-	public function publishTikTokVideo(string $accessToken, string $title, string $videoUrl, int $videoCoverTimestampMs, bool $disableComment = true, string $privacy_level = 'MUTUAL_FOLLOW_FRIENDS', bool $disableDuet = false, bool $disableStitch = false): object|array|string
+	public function publishTikTokVideo(string $accessToken, string $title, string $videoUrl, int $videoCoverTimestampMs, bool $disableComment = true, string $privacyLevel = 'SELF_ONLY', bool $disableDuet = false, bool $disableStitch = false): object|array|string
 	{
 		$endpoint = 'post/publish/video/init/';
 
@@ -286,7 +286,7 @@ class TikTokOAuth extends Config
 		$params = [
 			'post_info' => [
 				"title" => $title,
-				"privacy_level" => 'SELF_ONLY',
+				"privacy_level" => $privacyLevel,
 				"disable_duet" => $disableDuet,
 				"disable_comment" => $disableComment,
 				"disable_stitch" => $disableDuet,
