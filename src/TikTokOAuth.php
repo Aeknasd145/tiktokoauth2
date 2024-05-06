@@ -225,15 +225,21 @@ class TikTokOAuth extends Config
 
 		$headers = [
 			'Authorization' => "Bearer {$accessToken}",
-			'Content-Type' => 'application/json; charset=UTF-8',
+			'Content-Type' => "application/json; charset=UTF-8",
 		];
 
-		return $this->post("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers)->getBody();
+		try {
+			$response = $this->post("v{$this->apiVersion}/$endpoint", baseUrl: self::UPLOAD_HOST, headers: $headers);
+
+			return $response->getBody();
+		} catch (Exception $e) {
+			error_log('Error in getQueryCreatorInfo: ' . $e->getMessage());
+			return "Error: " . $e->getMessage();
+		}
 	}
 
-	// TODO: not tested yet
 	/*
-	* only works with url sources
+	 * Only works with url sources
 	*/
 	public function publishTikTokPhoto(string $accessToken, string $title, string $description, array $photoImages, bool $disableComment = true, string $privacy_level = 'PUBLIC_TO_EVERYONE', bool $autoAddMusic = true): object|array|string
 	{
@@ -241,7 +247,7 @@ class TikTokOAuth extends Config
 
 		$headers = [
 			'Authorization' => "Bearer {$accessToken}",
-			'Content-Type' => 'application/json'
+			'Content-Type' => "application/json"
 		];
 
 		$params = [
@@ -249,7 +255,7 @@ class TikTokOAuth extends Config
 				"title" => $title,
 				"description" => $description,
 				"disable_comment" => $disableComment,
-				"privacy_level" => $privacy_level,
+				"privacy_level" => 'SELF_ONLY',
 				"auto_add_music" => $autoAddMusic
 			],
 			'source_info' => [
@@ -259,6 +265,52 @@ class TikTokOAuth extends Config
 			],
 			'post_mode' => 'DIRECT_POST',
 			'media_type' => 'PHOTO'
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST, $headers)->getBody();
+	}
+
+	/*
+	 * Only works with url sources
+	*/
+	public function publishTikTokVideo(string $accessToken, string $title, string $videoUrl, int $videoCoverTimestampMs, bool $disableComment = true, string $privacy_level = 'MUTUAL_FOLLOW_FRIENDS', bool $disableDuet = false, bool $disableStitch = false): object|array|string
+	{
+		$endpoint = 'post/publish/video/init/';
+
+		$headers = [
+			'Authorization' => "Bearer {$accessToken}",
+			'Content-Type' => "application/json"
+		];
+
+		$params = [
+			'post_info' => [
+				"title" => $title,
+				"privacy_level" => 'SELF_ONLY',
+				"disable_duet" => $disableDuet,
+				"disable_comment" => $disableComment,
+				"disable_stitch" => $disableDuet,
+				"video_cover_timestamp_ms" => $videoCoverTimestampMs
+			],
+			'source_info' => [
+				"source" => "PULL_FROM_URL",
+				"video_url" => $videoUrl
+			]
+		];
+
+		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST, $headers)->getBody();
+	}
+
+	public function getPostStatus(string $accessToken, string $publishId): object|array|string
+	{
+		$endpoint = 'post/publish/status/fetch/';
+
+		$headers = [
+			'Authorization' => "Bearer {$accessToken}",
+			'Content-Type' => "application/json"
+		];
+
+		$params = [
+			'publish_id' => $publishId
 		];
 
 		return $this->post("v{$this->apiVersion}/$endpoint", $params, self::UPLOAD_HOST, $headers)->getBody();
