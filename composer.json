@@ -1,0 +1,25 @@
+{
+    "name": "aeknasd145/tiktokoauth2",
+    "type": "library",
+    "description": "TikTok API client. Handles OAuth, CSRF protection. Easy to implement and extend. This is a standalone library for any composer project.",
+    "keywords": ["TikTok", "OAuth", "API", "Client", "SDK"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abbas Eren Kılıç",
+            "email": "abbaserenkilic@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0 || ^8.1",
+        "ext-curl": "*",
+        "composer/ca-bundle": "^1.2"
+    },
+    "require-dev": {
+        "php-http/guzzle5-adapter": "^1.0",
+        "guzzlehttp/psr7": "^1.2"
+    },
+    "autoload": {
+        "psr-4": { "Aeknasd145\\tiktokoauth2\\": "src/" }
+    }
+}
