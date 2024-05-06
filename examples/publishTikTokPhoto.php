@@ -28,5 +28,3 @@
     $postStatusErrorCode = $postStatusData['error']['code'];
     $postStatusErrorMessage = $postStatusData['error']['message'];
     $postStatusErrorLogId = $postStatusData['error']['log_id'];
-?>
-<a href="<?= $tikTokAuthUrl; ?>">Login with TikTok</a>
