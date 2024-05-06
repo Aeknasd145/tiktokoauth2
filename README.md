@@ -55,3 +55,7 @@ $duetDisabled = $queryCreatorInfo['duet_disabled'];
 $maxVideoPostDurationSec = $queryCreatorInfo['max_video_post_duration_sec'];
 $privacyLevelOptions = $queryCreatorInfo['privacy_level_options']; // array, [0]=> string(18) "PUBLIC_TO_EVERYONE" [1]=> string(21) "MUTUAL_FOLLOW_FRIENDS" [2]=> string(9) "SELF_ONLY" 
 ```
+
+
+## Error Message Info
+- If you got 'unaudited_client_can_only_post_to_private_accounts' error, that means you are approved by tiktok for 'video.publish' scope but you need to apply for advanced access. Now, you can only post for private pages, you have this scope for basically testing purposes. Check https://developers.tiktok.com/doc/content-sharing-guidelines#direct_post_api_-_developer_guidelines
