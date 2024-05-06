@@ -56,6 +56,41 @@ $maxVideoPostDurationSec = $queryCreatorInfo['max_video_post_duration_sec'];
 $privacyLevelOptions = $queryCreatorInfo['privacy_level_options']; // array, [0]=> string(18) "PUBLIC_TO_EVERYONE" [1]=> string(21) "MUTUAL_FOLLOW_FRIENDS" [2]=> string(9) "SELF_ONLY" 
 ```
 
+## How to Direct Post Photo?
+```php
+$title = 'Content Title';
+$caption = 'Content caption';
+// $contentFiles has to be array and at least 2 image
+$contentFiles = [
+    'https://site.com/file-url.png',
+    'https://site.com/file-url-2.png,
+];
+
+$photoData = $this->publishTikTokPhoto($accessToken, $title, $caption, $contentFiles);
+
+// TODO: if status is PROCESSING_DOWNLOAD, it should try again, you should use sleep and var getPostStatus inside do while
+sleep(5); // wait a few seconds
+$postStatusData = $this->getPostStatus($accessToken, $photoData['data']['publish_id']);
+
+$postStatus = $postStatusData['data']['status'];
+$postStatusErrorCode = $postStatusData['error']['code'];
+$postStatusErrorMessage = $postStatusData['error']['message'];
+$postStatusErrorLogId = $postStatusData['error']['log_id'];
+```
+
+## How to Direct Post Video?
+```php
+$title = 'Content Title';
+$videoUrl = 'https://site.com/video.mp4';
+$videoCoverTimestampMs = 1000; // ms of the cover picture
+
+$videoData = $this->publishTiktokVideo($accessToken, $title, $videoUrl, $videoCoverTimestampMs);
+
+$videoPublishId = $videoData['data']['publish_id'];
+$videoErrorCode = $videoData['error']['code'];
+$videoErrorMessage = $videoData['error']['message'];
+$videoErrorLogId = $videoData['error']['log_id'];
+```
 
 ## Error Message Info
 - If you got 'unaudited_client_can_only_post_to_private_accounts' error, that means you are approved by tiktok for 'video.publish' scope but you need to apply for advanced access. Now, you can only post for private pages, you have this scope for basically testing purposes. Check https://developers.tiktok.com/doc/content-sharing-guidelines#direct_post_api_-_developer_guidelines
