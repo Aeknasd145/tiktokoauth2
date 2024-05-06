@@ -272,6 +272,7 @@ class TikTokOAuth extends Config
 
 	/*
 	 * Only works with url sources
+  	 * You will see '--header 'Content-Type: application/json; charset=UTF-8' \' in the official documentation but nevermind I got error when i use it, and it worked when I use 'Content-Type: application/json'
 	*/
 	public function publishTikTokVideo(string $accessToken, string $title, string $videoUrl, int $videoCoverTimestampMs, bool $disableComment = true, string $privacy_level = 'MUTUAL_FOLLOW_FRIENDS', bool $disableDuet = false, bool $disableStitch = false): object|array|string
 	{
