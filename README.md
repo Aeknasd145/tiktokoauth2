@@ -2,8 +2,8 @@
 TikTok OAuth 2 PHP8 api created by base of [TikTok Developers Documentation](https://developers.tiktok.com/).
 This api just support [Login Kit](https://developers.tiktok.com/doc/login-kit-web/) for now. Other functions will be added soon.
 
-## How to Install?
-composer require aeknasd145/tiktokoauth2
+## How to Install via Composer?
+`composer require aeknasd145/tiktokoauth2`
 
 ## How to get OAuth Url for Login with TikTok?
 ```php
