@@ -98,3 +98,7 @@ $videoErrorLogId = $videoData['error']['log_id'];
 ## Error Message Experience Different Then Official Documentation
 - If you got 'unaudited_client_can_only_post_to_private_accounts' error, that means you are approved by tiktok for 'video.publish' scope but you need to apply for advanced access. Now, you can only post for private pages, you have this scope for basically testing purposes. Check https://developers.tiktok.com/doc/content-sharing-guidelines#direct_post_api_-_developer_guidelines
 - In the Direct Post Video section you will see '--header 'Content-Type: application/json; charset=UTF-8' \' but nevermind I got error when i use it, and it worked when I use 'Content-Type: application/json'
+
+
+## Credit
+[Social Media Tools](https://plexorin.com/).
